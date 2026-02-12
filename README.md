@@ -9,14 +9,15 @@
 ![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
 
 ## 📜 License
-This project is licensed under **Creative Commons Attribution-NonCommercial 4.0 International**. 
+This project is licensed under **Creative Commons Attribution-NonCommercial 4.0 International**.  
 You are free to use, share, and adapt this software, but **you may not use the material for commercial purposes**.
 
 ## ✨ Why eMojiSync?
 Unlike web-based solutions, eMojiSync runs as a standalone process, ensuring higher stability and cleaner screen capture.
 - **Dual-Window System:** A dedicated Control Panel for settings and a clean "Avatar Window" for OBS capture.
-- **Background-Ready:** The app continues to process your voice even when it's behind other windows (like your game).
+- **System Tray Integration:** Minimize the app to the system tray (near the clock) to keep your taskbar clean while keeping the microphone active.
 - **Zero Lag:** Instantaneous synchronization between your voice and the emoji animation.
+- **Ghost Window:** The avatar window doesn't clutter your taskbar, making it perfect for clean desktop management.
 
 ---
 
@@ -40,6 +41,9 @@ For users who just want to run the program (no coding required):
 3. **Fine-Tuning:**
    - **Sensitivity:** Adjust to ignore background noise or mechanical keyboard clicks.
    - **Zoom/Position:** Control the framing of the avatar within the capture window.
+4. **💡 Pro Tip (Background Running):** - When you click **Minimize**, the dashboard hides in the **System Tray** (near the Windows clock). 
+   - This prevents Windows from freezing the audio process. 
+   - To open settings again, **double-click** the icon in the tray.
 
 ---
 
@@ -47,17 +51,27 @@ For users who just want to run the program (no coding required):
 
 To integrate the avatar into your stream:
 
-1. Keep **eMojiSync** open (it must not be minimized to the taskbar, though it can stay in the background).
+1. Open **eMojiSync** and set up your emojis.
 2. In OBS, add a new **Window Capture** source.
 3. Select the window: `[eMojiSync.exe]: eMojiSync - Avatar Window`.
 4. **IMPORTANT:** In the *Capture Method* field, select **Windows 10 (1903 or higher)**.
+5. **Note:** Even if you minimize the dashboard to the tray, the avatar will remain visible to OBS as long as you don't manually close the app.
+
+---
+
+## 💖 Support the Project
+
+If **eMojiSync** helps your stream, consider supporting the developer:
+
+* [🚀 Support via APOIA.se (Brazil)](https://apoia.se/YOUR_LINK_HERE)
+* [💸 Support via LivePix](https://livepix.gg/YOUR_LINK_HERE)
 
 ---
 
 ## ❓ Troubleshooting
 
 **Avatar window is not appearing in OBS:**
-- Make sure the Avatar Window is not minimized.
+- Ensure the app is running (check the System Tray near the clock).
 - Try running OBS as an **Administrator**.
 
 **The Avatar screen is black in OBS:**
@@ -71,9 +85,9 @@ To integrate the avatar into your stream:
 
 ## 👨‍💻 For Developers (Build)
 
-If you wish to modify the source code or contribute:
+If you wish to modify the source code or contribute (Node.js required):
 
-```open project folder in powershell to run commands (Node.js is must be installed):
+```powershell
 # Install dependencies
 npm install
 
