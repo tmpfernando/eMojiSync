@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>eMojiSync - Dashboard</title>
+    <style>
+        :root { 
+            --primary: #00f2fe; --accent: #4facfe; --bg-dark: #0a0a0b;
+            --panel-bg: #141416; --item-bg: #252529;
+            --text-main: #e0e0e0; --text-dim: #71717a;
+            --danger: #ff4b2b; --success: #00e676;
+        }
+        body { 
+            margin: 0; background: var(--bg-dark); color: var(--text-main); 
+            font-family: 'Inter', -apple-system, sans-serif; height: 100vh; 
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        #controles { padding: 20px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; flex-grow: 1; }
+        .secao { 
+            display: flex; flex-direction: column; gap: 10px; background: var(--panel-bg); 
+            padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);
+        }
+        /* 2. Estilização da Marca eMojiSync */
+        .brand { 
+            font-size: 22px; font-weight: 900; text-align: center; margin-bottom: 10px;
+            background: linear-gradient(to right, var(--primary), var(--accent)); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            letter-spacing: -1px;
+        }
+        .icon-header { font-size: 11px; color: var(--accent); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group label { font-size: 10px; color: var(--text-dim); }
+        
+        select, input[type=text] { 
+            width: 100%; padding: 10px; background: var(--item-bg); border: 1px solid rgba(255,255,255,0.1); 
+            color: white; border-radius: 8px; box-sizing: border-box; outline: none; font-size: 12px;
+        }
+
+        .range-wrapper { display: grid; grid-template-columns: 65px 1fr; align-items: center; gap: 10px; font-size: 11px; color: var(--text-dim); }
+        input[type=range] { width: 100%; accent-color: var(--primary); cursor: pointer; }
+        
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { 
+            padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 11px; transition: 0.3s;
+        }
+        button.success { background: var(--success); color: #000; }
+        button.danger { background: var(--danger); color: white; }
+        button.secondary { background: #333; color: white; }
+
+        .presets-container { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+        .btn-preset { 
+            padding: 5px 8px; background: var(--item-bg); border: 1px solid rgba(255,255,255,0.1); 
+            color: var(--text-dim); border-radius: 4px; font-size: 10px; cursor: pointer; text-transform: none; 
+        }
+        .btn-preset:hover { border-color: var(--accent); color: white; }
+
+        .scenario-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 6px; }
+        .scenario-item { 
+            background: var(--item-bg); border-radius: 8px; aspect-ratio: 1/1; 
+            display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 20px; border: 2px solid transparent; transition: 0.2s;
+        }
+        .scenario-item.active { border-color: var(--primary); background: rgba(0, 242, 254, 0.15); }
+        
+        .meter-container { width: 100%; height: 8px; background: #000; border-radius: 4px; overflow: hidden; }
+        #meter-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.1s; }
+    </style>
+</head>
+<body onmousedown="focarAvatar()">
+
+    <div id="controles">
+        <div class="brand">eMojiSync</div>
+        
+        <div class="secao">
+            <div class="icon-header">Audio Source</div>
+            <select id="audioSource" onchange="alterarFonteAudio()"></select>
+            <div class="meter-container"><div id="meter-fill"></div></div>
+            <div class="btn-group">
+                <button id="btnToggle" class="success" onclick="toggleEmoji()">Enable Avatar</button>
+                <button class="secondary" onclick="resetConfig()">Reset All</button>
+            </div>
+        </div>
+
+        <div class="secao">
+            <div class="icon-header">Scene (Static)</div>
+            <div class="scenario-grid" id="bgGrid">
+                <div id="no-bg" class="scenario-item active" onclick="setBg(this, '')">❌</div>
+            </div>
+        </div>
+
+        <div class="secao">
+            <div class="icon-header">Expressions</div>
+            <div class="input-group">
+                <label>Idle (Silence)</label>
+                <input type="text" id="emojiSilencio" value="😐" maxlength="2" oninput="salvarConfig()">
+            </div>
+            <div class="input-group">
+                <label>Speaking Sequence</label>
+                <input type="text" id="emojiSequencia" value="🫤😯😦😧😲😮🫨" oninput="salvarConfig()">
+                <div class="presets-container">
+                    <button class="btn-preset" onclick="setPreset('🫤😯😦😧😲😮🫨', '😐')">Default</button>
+                    <button class="btn-preset" onclick="setPreset('😛😵😜😝😱🤪🤩🤯', '🤐')">Crazy</button>
+                    <button class="btn-preset" onclick="setPreset('🐱😹😸🙀😻', '😼')">Cat</button>
+                    <button class="btn-preset" onclick="setPreset('😠😰😨😭😩😬😫🤬', '😡')">Mad</button>
+                    <button class="btn-preset" onclick="setPreset('😉😀🤣😃🤤😄😁😆', '😊')">Happy</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="secao">
+            <div class="icon-header">Transform & Physics</div>
+            <div class="range-wrapper"><span>Mic Sens.</span><input type="range" id="threshold" min="-60" max="-5" value="-25" oninput="salvarConfig()"></div>
+            <div class="range-wrapper"><span>Motion</span><input type="range" id="intensidade" min="0" max="2" step="0.1" value="1" oninput="salvarConfig()"></div>
+            <div class="range-wrapper"><span>Zoom</span><input type="range" id="zoom" min="0.3" max="5.0" step="0.1" value="1" oninput="salvarConfig()"></div>
+            <div class="range-wrapper"><span>X Axis</span><input type="range" id="posX" min="-1000" max="1000" value="0" oninput="salvarConfig()"></div>
+            <div class="range-wrapper"><span>Y Axis</span><input type="range" id="posY" min="-800" max="800" value="0" oninput="salvarConfig()"></div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        let selectedBg = "", volumeSuave = 0, analyser, dataArray, audioStream, audioCtx;
+        let emojiAtivo = false;
+        let frameCount = 0;
+        let lastDataString = ""; 
+
+        function focarAvatar() { ipcRenderer.send('force-focus-avatar'); }
+
+        async function listarFontes() {
+            const dispositivos = await navigator.mediaDevices.enumerateDevices();
+            const select = document.getElementById('audioSource');
+            select.innerHTML = '';
+            dispositivos.forEach(dev => {
+                if (dev.kind === 'audioinput') {
+                    const opt = document.createElement('option');
+                    opt.value = dev.deviceId;
+                    opt.text = dev.label || `Microfone ${select.length + 1}`;
+                    select.appendChild(opt);
+                }
+            });
+            carregarConfig();
+        }
+
+        async function alterarFonteAudio() {
+            if (emojiAtivo) await iniciarAudio();
+            salvarConfig();
+        }
+
+        async function iniciarAudio() {
+            if (audioStream) audioStream.getTracks().forEach(t => t.stop());
+            const deviceId = document.getElementById('audioSource').value;
+            try {
+                audioStream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: { 
+                        deviceId: deviceId ? { exact: deviceId } : undefined,
+                        autoGainControl: false,
+                        noiseSuppression: false 
+                    } 
+                });
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const source = audioCtx.createMediaStreamSource(audioStream);
+                analyser = audioCtx.createAnalyser(); 
+                analyser.fftSize = 128; 
+                source.connect(analyser);
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+            } catch (err) { console.error("Erro áudio:", err); }
+        }
+
+        function toggleEmoji() {
+            emojiAtivo = !emojiAtivo;
+            const btn = document.getElementById('btnToggle');
+            if (emojiAtivo) {
+                iniciarAudio();
+                btn.textContent = "Disable Avatar";
+                btn.className = "danger";
+            } else {
+                if (audioStream) audioStream.getTracks().forEach(t => t.stop());
+                btn.textContent = "Enable Avatar";
+                btn.className = "success";
+                volumeSuave = 0;
+                enviarParaAvatar();
+            }
+        }
+
+        function setPreset(sequencia, idle) {
+            document.getElementById('emojiSequencia').value = sequencia;
+            if (idle) document.getElementById('emojiSilencio').value = idle;
+            salvarConfig();
+        }
+
+        const scenes = ["☀️", "☁️", "⛈️", "❄️", "🌊", "🔥", "🌋", "🌲", "🌴", "🌵", "🏙️", "🌆", "🌇", "🌃", "🏙", "🏘️", "🏰", "🏛️", "🎡", "🗼", "🏔️", "⛰️", "🏜️", "🏝️", "🏕️", "🛤️", "🛣️", "🏟️", "🏗️", "🛸", "🏠", "🏪", "🏫", "🏭", "🏮", "🌌", "🌈", "⛩️", "🕋", "⛪"];
+        const grid = document.getElementById('bgGrid');
+        scenes.forEach(s => {
+            const d = document.createElement('div'); d.className = 'scenario-item'; d.textContent = s;
+            d.onclick = () => setBg(d, s);
+            grid.appendChild(d);
+        });
+
+        function setBg(elemento, bgChar) {
+            selectedBg = bgChar;
+            document.querySelectorAll('.scenario-item').forEach(i => i.classList.remove('active'));
+            elemento.classList.add('active');
+            salvarConfig();
+        }
+
+        function salvarConfig() {
+            const config = {
+                threshold: document.getElementById('threshold').value,
+                intensidade: document.getElementById('intensidade').value,
+                zoom: document.getElementById('zoom').value,
+                posX: document.getElementById('posX').value,
+                posY: document.getElementById('posY').value,
+                emojiSilencio: document.getElementById('emojiSilencio').value,
+                emojiSequencia: document.getElementById('emojiSequencia').value,
+                deviceId: document.getElementById('audioSource').value,
+                selectedBg: selectedBg
+            };
+            localStorage.setItem('emojiSyncConfig', JSON.stringify(config));
+            enviarParaAvatar();
+        }
+
+        function carregarConfig() {
+            const salva = localStorage.getItem('emojiSyncConfig');
+            if (salva) {
+                const c = JSON.parse(salva);
+                document.getElementById('threshold').value = c.threshold;
+                if(c.intensidade) document.getElementById('intensidade').value = c.intensidade;
+                document.getElementById('zoom').value = c.zoom;
+                document.getElementById('posX').value = c.posX;
+                document.getElementById('posY').value = c.posY;
+                document.getElementById('emojiSilencio').value = c.emojiSilencio;
+                document.getElementById('emojiSequencia').value = c.emojiSequencia;
+                document.getElementById('audioSource').value = c.deviceId || "";
+                selectedBg = c.selectedBg || "";
+                document.querySelectorAll('.scenario-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.textContent === selectedBg || (selectedBg === "" && item.textContent === "❌")) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+            lastDataString = ""; 
+            enviarParaAvatar();
+        }
+
+        function resetConfig() {
+            localStorage.removeItem('emojiSyncConfig');
+            location.reload();
+        }
+
+        function loopLogica() {
+            requestAnimationFrame(loopLogica); 
+
+            if (!emojiAtivo || !analyser) {
+                if (!emojiAtivo) {
+                    const meter = document.getElementById('meter-fill');
+                    if(meter.style.width !== "0%") meter.style.width = "0%";
+                }
+                return;
+            }
+
+            analyser.getByteFrequencyData(dataArray);
+            let sum = 0; 
+            for(let i = 0; i < dataArray.length; i++) sum += dataArray[i] * dataArray[i];
+            
+            let rms = Math.sqrt(sum / dataArray.length);
+            let db = 20 * Math.log10(rms / 255 || 0.00001);
+            
+            const thresh = parseFloat(document.getElementById('threshold').value);
+            let volMapeado = (db > thresh) ? (db - thresh) / (Math.abs(thresh) || 1) * 150 : 0;
+            
+            volumeSuave += (volMapeado - volumeSuave) * 0.25;
+            
+            if (document.hasFocus()) {
+                document.getElementById('meter-fill').style.width = Math.min(100, (db + 60) * 1.6) + "%";
+            }
+            
+            enviarParaAvatar();
+        }
+
+        function enviarParaAvatar() {
+            let emojiDesejado = "";
+            if (emojiAtivo) {
+                emojiDesejado = document.getElementById('emojiSilencio').value;
+                if (volumeSuave > 2) {
+                    const seq = [...document.getElementById('emojiSequencia').value];
+                    // Velocidade de troca (aumente este número para ficar mais lento)
+                    let velocidadeAnimacao = 20; 
+                    let indiceAnimado = Math.floor(frameCount / velocidadeAnimacao) % seq.length;
+                    emojiDesejado = seq[indiceAnimado] || emojiDesejado;
+                    frameCount++; 
+                } else {
+                    frameCount = 0;
+                }
+            }
+
+            const currentData = {
+                emoji: emojiDesejado,
+                bg: selectedBg, 
+                zoom: parseFloat(document.getElementById('zoom').value),
+                posX: parseFloat(document.getElementById('posX').value),
+                posY: parseFloat(document.getElementById('posY').value),
+                intensidade: parseFloat(document.getElementById('intensidade').value),
+                pulo: Math.round(volumeSuave / 8 * 10) / 10 
+            };
+
+            const dataString = JSON.stringify(currentData);
+            if (dataString !== lastDataString) {
+                ipcRenderer.send('update-avatar', currentData);
+                lastDataString = dataString;
+            }
+        }
+
+        window.onload = async () => {
+            await listarFontes();
+            requestAnimationFrame(loopLogica);
+        };
+    </script>
+</body>
+</html>

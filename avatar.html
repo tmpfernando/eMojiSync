@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>eMojiSync - Viewport</title>
+    <style>
+        body, html { 
+            margin: 0; padding: 0; 
+            background: transparent !important; 
+            overflow: hidden; 
+            height: 100vh; width: 100vw; 
+        }
+        /* Otimização: Força a GPU a tratar o canvas como uma camada separada */
+        canvas { display: block; will-change: transform; }
+    </style>
+</head>
+<body>
+    <canvas id="avatarCanvas"></canvas>
+    <script>
+        const { ipcRenderer } = require('electron');
+        const canvas = document.getElementById('avatarCanvas');
+        const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true }); 
+        
+        let config = { emoji: "", bg: "", zoom: 1, posX: 0, posY: 0, intensidade: 1, pulo: 0 };
+        let emojiExibido = "";
+        let rotation_atual = 0;
+        let noiseOffset = 0;
+
+        function resize() { 
+            canvas.width = window.innerWidth; 
+            canvas.height = window.innerHeight; 
+        }
+        window.onresize = resize; 
+        resize();
+
+        ipcRenderer.on('apply-changes', (event, data) => {
+            emojiExibido = data.emoji;
+            config = data;
+        });
+
+        function render(time) {
+            if (!emojiExibido && !config.bg) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                requestAnimationFrame(render);
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const z = config.zoom;
+            const volume = config.pulo; 
+            const m = config.intensidade ?? 1; 
+
+            // --- 1. CENÁRIO ESTÁTICO ---
+            if (config.bg) {
+                ctx.save();
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.font = "600px 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif"; 
+                ctx.fillText(config.bg, canvas.width / 2, canvas.height / 2);
+                ctx.restore();
+            }
+
+            if (!emojiExibido) {
+                requestAnimationFrame(render);
+                return;
+            }
+
+            // --- 2. CÁLCULO DA FÍSICA ---
+            noiseOffset += 0.05 * m; 
+            let balancoX = Math.sin(noiseOffset * 0.5) * (5 * z * m);
+            
+            let targetRotation = 0;
+            if (volume > 15 && m > 0.5) {
+                targetRotation = (time * 0.02) * m; 
+            } else {
+                targetRotation = Math.sin(time * 0.01) * (volume * 0.05 * m);
+            }
+            
+            rotation_atual += (targetRotation - rotation_atual) * 0.1;
+
+            const cx = (canvas.width / 2) + config.posX + balancoX;
+            const cy = (canvas.height / 2) + config.posY - (volume * 10 * z * m);
+
+            // --- 3. DESENHO DO EMOJI ---
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(rotation_atual);
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            // Prioriza Segoe UI Emoji para garantir cores no Windows
+            ctx.font = (300 * z) + "px 'Segoe UI Emoji', 'Apple Color Emoji', Arial, sans-serif";
+            ctx.fillText(emojiExibido, 0, 0);
+            ctx.restore();
+
+            requestAnimationFrame(render);
+        }
+        
+        requestAnimationFrame(render);
+    </script>
+</body>
+</html>

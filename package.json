@@ -1,0 +1,24 @@
+{
+  "name": "emojisync",
+  "version": "1.0.0",
+  "description": "Emoji animation App for capture on streaming software",
+  "main": "main.js",
+  "author": "TMPfernando",
+  "license": "ISC",
+  "scripts": {
+    "start": "electron .",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "make-all": "electron-forge make --arch x64,ia32"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.3.0",
+    "@electron-forge/core": "^7.3.0",
+    "@electron-forge/maker-squirrel": "^7.3.0",
+    "@electron-forge/maker-zip": "^7.3.0",
+    "electron": "latest"
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0"
+  }
+}
