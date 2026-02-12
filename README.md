@@ -36,7 +36,6 @@ For users who just want to run the program (no coding required):
 3. **Fine-Tuning:**
    - **Sensitivity:** Adjust to ignore background noise or mechanical keyboard clicks.
    - **Zoom/Position:** Control the framing of the avatar within the capture window.
-   - **Chroma Key:** Choose the background color (Green, Blue, or Magenta) for transparency.
 
 ---
 
@@ -48,8 +47,6 @@ To integrate the avatar into your stream:
 2. In OBS, add a new **Window Capture** source.
 3. Select the window: `[eMojiSync.exe]: eMojiSync - Avatar Window`.
 4. **IMPORTANT:** In the *Capture Method* field, select **Windows 10 (1903 or higher)**.
-5. Right-click the source in OBS > **Filters** > `+` > **Chroma Key**.
-6. Match the color to your app’s background and you are ready to go!
 
 ---
 
