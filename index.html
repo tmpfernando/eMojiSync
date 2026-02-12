@@ -239,7 +239,7 @@
 
                 noiseOffset += 0.05 * m;
                 // Pulo limitado e suavizado
-                let jump = Math.min(volumeSuave * 4 * z * m, canvas.height / 3);
+                let jump = Math.min(volumeSuave * 1 * z * m, canvas.height / 3);
                 let balancoX = Math.sin(noiseOffset * 0.5) * (5 * z * m);
                 
                 ctx.save();
@@ -327,3 +327,4 @@
     </script>
 </body>
 </html>
+
