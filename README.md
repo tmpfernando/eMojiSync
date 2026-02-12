@@ -21,7 +21,7 @@ Unlike web-based solutions, eMojiSync runs as a standalone process, ensuring hig
 For users who just want to run the program (no coding required):
 
 1. Navigate to the [**Releases**](https://github.com/tmpfernando/eMojiSync/releases/tag/eMojiSync_x64) tab.
-2. Download the `eMojiSync-win32-x64.zip` file (or the `.exe` installer if available).
+2. Download the `eMojiSync-win32-x64.zip` file.
 3. Extract the contents to a folder of your choice.
 4. Run the **`eMojiSync.exe`** file.
 5. **Tip:** Right-click `eMojiSync.exe` and select `Send to > Desktop (Create shortcut)` for quick access.
