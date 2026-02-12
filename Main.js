@@ -1,53 +1,40 @@
-const { app, BrowserWindow, ipcMain, powerSaveBlocker } = require('electron');
+const { app, BrowserWindow, ipcMain, powerSaveBlocker, Menu, Tray } = require('electron');
 const path = require('path');
 
-// Define o nome do aplicativo para o Sistema Operacional
 app.name = "eMojiSync";
+const iconPath = path.join(__dirname, 'assets', 'icon.png');
 
 let dashboardWindow;
 let avatarWindow;
+let tray = null;
 
-/**
- * 1. OTIMIZAÇÕES DE HARDWARE (ANTERIORES À INICIALIZAÇÃO)
- * Desativar recursos pesados do Chromium para focar em renderização 2D leve.
- */
-app.commandLine.appendSwitch('disable-software-rasterizer');
-app.commandLine.appendSwitch('disable-gpu-compositing');
+// Flags para manter o motor gráfico e de áudio sempre ligados
 app.commandLine.appendSwitch('disable-renderer-backgrounding');
 app.commandLine.appendSwitch('disable-background-timer-throttling');
-app.commandLine.appendSwitch('force-device-scale-factor', '1');
+app.commandLine.appendSwitch('disable-backgrounding-occluded-windows');
+app.commandLine.appendSwitch('background-best-effort', 'false');
 
-/**
- * CONFIGURAÇÕES GERAIS DE PERFORMANCE
- */
 powerSaveBlocker.start('prevent-app-suspension');
 
-const iconPath = path.join(__dirname, 'assets', 'icon.png');
-
 function createWindows() {
-    // 1. JANELA DO AVATAR (O EMOJI)
+    // 1. JANELA DO AVATAR
     avatarWindow = new BrowserWindow({
         width: 1920,
         height: 1080,
         transparent: true,
         frame: false,
         icon: iconPath,
-        alwaysOnTop: false,
-        resizable: true,
-        show: false, // Evita o flash branco ao carregar
+        show: false,
+        skipTaskbar: true, // Remove o ícone da barra de tarefas para não poluir
         webPreferences: {
-            nodeIntegration: true,    // Necessário para o ipcRenderer funcionar
-            contextIsolation: false,  // Permite o uso do require no script
-            backgroundThrottling: false,
-            offscreen: false,
-            devTools: false
+            nodeIntegration: true,
+            contextIsolation: false,
+            backgroundThrottling: false
         }
     });
 
     avatarWindow.loadFile('avatar.html');
     avatarWindow.setIgnoreMouseEvents(true);
-
-    // Mostra a janela apenas quando estiver pronta
     avatarWindow.once('ready-to-show', () => avatarWindow.show());
 
     // 2. JANELA DE CONFIGURAÇÕES (DASHBOARD)
@@ -56,7 +43,6 @@ function createWindows() {
         height: 950,
         title: "eMojiSync - Dashboard",
         icon: iconPath,
-        resizable: true,
         autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: true,
@@ -67,33 +53,61 @@ function createWindows() {
 
     dashboardWindow.loadFile('index.html');
 
+    /**
+     * NOVA LÓGICA DE MINIMIZAÇÃO:
+     * Escondemos a Dashboard para manter o áudio.
+     * Mantemos o Avatar "aberto", mas enviamos para trás de tudo.
+     */
+    dashboardWindow.on('minimize', (event) => {
+        event.preventDefault();
+        dashboardWindow.hide(); // Esconde a dashboard (áudio continua ok)
+        
+        // O Avatar continua aberto para o OBS ver, mas vai para trás das janelas
+        if (avatarWindow) {
+            avatarWindow.blur(); 
+            // Opcional: avatarWindow.setAlwaysOnTop(false);
+        }
+    });
+
+    const showAll = () => {
+        dashboardWindow.show();
+        dashboardWindow.restore();
+        if (avatarWindow) {
+            avatarWindow.show(); // Garante que esteja visível
+        }
+    };
+
     dashboardWindow.on('closed', () => {
         app.quit();
     });
+
+    createTray(showAll);
+}
+
+function createTray(showAllCallback) {
+    tray = new Tray(iconPath);
+    const contextMenu = Menu.buildFromTemplate([
+        { label: 'Open Settings', click: () => showAllCallback() },
+        { type: 'separator' },
+        { label: 'Quit eMojiSync', click: () => app.quit() }
+    ]);
+
+    tray.setToolTip('eMojiSync - Running');
+    tray.setContextMenu(contextMenu);
+    tray.on('double-click', () => showAllCallback());
 }
 
 /**
- * COMUNICAÇÃO ENTRE JANELAS (IPC)
- * eMojiSync utiliza um canal direto para enviar dados de áudio processados.
+ * COMUNICAÇÃO IPC
  */
 ipcMain.on('update-avatar', (event, data) => {
     if (avatarWindow && !avatarWindow.isDestroyed()) {
-        // Envia os dados de transformação e emoji para o Canvas do avatar
         avatarWindow.webContents.send('apply-changes', data);
     }
 });
 
-ipcMain.on('force-focus-avatar', () => {
-    if (avatarWindow && !avatarWindow.isDestroyed()) {
-        avatarWindow.moveTop();
-    }
-});
-
-// Inicialização do App
 app.whenReady().then(createWindows);
 
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
+    if (process.platform !== 'darwin') app.quit();
 });
