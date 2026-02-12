@@ -1,2 +1,83 @@
-# eMojiSync
-🎭 eMojiSync | Transform your voice into a reactive PNGtuber avatar with immersive sceneries. Web-based, and OBS-ready. 🚀
+# 🎙️ eMojiSync
+
+[Demonstration Video](https://www.youtube.com/watch?v=lNu-XfCwCkg) | [Legacy Browser Version](https://tmpfernando.github.io/Emoji-Scene/)
+
+**eMojiSync** is a minimalist desktop voice-reactive avatar application (PNGTuber style). Built with Electron, it was specifically designed for streamers who need an avatar that reacts to the microphone in real-time, eliminating performance bottlenecks and capture issues common in browser-based tools.
+
+![Version](https://img.shields.io/badge/Version-1.1.0-brightgreen)
+![Platform](https://img.shields.io/badge/Platform-Windows-blue)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+
+## ✨ Why eMojiSync?
+Unlike web-based solutions, eMojiSync runs as a standalone process, ensuring higher stability and cleaner screen capture.
+- **Dual-Window System:** A dedicated Control Panel for settings and a clean "Avatar Window" for OBS capture.
+- **Background-Ready:** The app continues to process your voice even when it's behind other windows (like your game).
+- **Zero Lag:** Instantaneous synchronization between your voice and the emoji animation.
+
+---
+
+## 📥 Installation
+
+For users who just want to run the program (no coding required):
+
+1. Navigate to the [**Releases**](https://github.com/tmpfernando/Emoji-Scene/releases) tab.
+2. Download the `eMojiSync-win32-x64.zip` file (or the `.exe` installer if available).
+3. Extract the contents to a folder of your choice.
+4. Run the **`eMojiSync.exe`** file.
+5. **Tip:** Right-click `eMojiSync.exe` and select `Send to > Desktop (Create shortcut)` for quick access.
+
+---
+
+## 🛠️ Configuration
+
+1. **Microphone:** Click **START MICROPHONE** upon launching to enable voice detection.
+2. **Customization:** - **Idle Emoji:** The emoji displayed when you are silent.
+   - **Talking Emojis:** A sequence of emojis (e.g., 😲😮😧) that creates the talking animation.
+3. **Fine-Tuning:**
+   - **Sensitivity:** Adjust to ignore background noise or mechanical keyboard clicks.
+   - **Zoom/Position:** Control the framing of the avatar within the capture window.
+   - **Chroma Key:** Choose the background color (Green, Blue, or Magenta) for transparency.
+
+---
+
+## 📺 OBS Studio Setup
+
+To integrate the avatar into your stream:
+
+1. Keep **eMojiSync** open (it must not be minimized to the taskbar, though it can stay in the background).
+2. In OBS, add a new **Window Capture** source.
+3. Select the window: `[eMojiSync.exe]: eMojiSync - Avatar Window`.
+4. **IMPORTANT:** In the *Capture Method* field, select **Windows 10 (1903 or higher)**.
+5. Right-click the source in OBS > **Filters** > `+` > **Chroma Key**.
+6. Match the color to your app’s background and you are ready to go!
+
+---
+
+## ❓ Troubleshooting
+
+**Avatar window is not appearing in OBS:**
+- Make sure the Avatar Window is not minimized.
+- Try running OBS as an **Administrator**.
+
+**The Avatar screen is black in OBS:**
+- In the Window Capture properties, you **must** change the *Capture Method* to "Windows 10 (1903 or higher)".
+
+**The Emoji is not moving:**
+- Ensure you have clicked the "START MICROPHONE" button.
+- Check if your microphone is set as the "Default Device" in Windows Sound Settings.
+
+---
+
+## 👨‍💻 For Developers (Build)
+
+If you wish to modify the source code or contribute:
+
+```powershell
+# Install dependencies
+npm install
+
+# Run in development mode
+npm start
+
+# Generate the executable/distributables
+npm run make
