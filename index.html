@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eMojiSync - Web Preview & OBS</title>
+    <title>eMojiSync - Web Preview</title>
     <style>
         :root { 
             --primary: #00f2fe; --accent: #4facfe; --bg-dark: #0a0a0b;
@@ -54,10 +54,9 @@
 
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         button { padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 10px; transition: 0.3s; }
-        button.success { background: var(--success); color: #000; }
+        button.success { background: var(--success); color: #000; width: 100%; grid-column: span 1; }
         button.danger { background: var(--danger); color: white; }
         button.secondary { background: #333; color: white; }
-        .btn-obs { background: var(--primary); color: #000; grid-column: span 2; }
 
         .range-wrapper { display: grid; grid-template-columns: 70px 1fr; align-items: center; gap: 10px; font-size: 11px; color: var(--text-dim); }
         input[type=range] { width: 100%; accent-color: var(--primary); cursor: pointer; }
@@ -73,10 +72,6 @@
         #viewport { position: relative; overflow: hidden; background: radial-gradient(circle, #1a1a1c 0%, #0a0a0b 100%); }
         canvas { display: block; width: 100%; height: 100%; }
         .hint-obs { position: absolute; bottom: 20px; right: 20px; color: var(--text-dim); font-size: 12px; pointer-events: none; }
-
-        body.mode-avatar { grid-template-columns: 1fr; }
-        body.mode-avatar #controles { display: none; }
-        body.mode-avatar #viewport { background: transparent !important; }
     </style>
 </head>
 <body>
@@ -85,7 +80,7 @@
         <div class="brand">eMojiSync</div>
         
         <div class="secao">
-            <div class="icon-header">Audio & OBS</div>
+            <div class="icon-header">Audio Settings</div>
             <select id="audioSource" onchange="alterarFonteAudio()"></select>
             <div class="meter-container">
                 <div id="meter-fill"></div>
@@ -94,7 +89,6 @@
             <div class="btn-group">
                 <button id="btnToggle" class="success" onclick="toggleEmoji()">Start Mic</button>
                 <button class="secondary" onclick="resetConfig()">Reset</button>
-                <button class="btn-obs" onclick="copiarLinkOBS()">🔗 Copy OBS Browser Link</button>
             </div>
         </div>
 
@@ -119,7 +113,7 @@
         </div>
 
         <div class="secao">
-            <div class="icon-header">Background (100% Opacity)</div>
+            <div class="icon-header">Background Scenario</div>
             <div class="scenario-grid" id="bgGrid">
                 <div id="no-bg" class="scenario-item active" onclick="setBg(this, '')">❌</div>
             </div>
@@ -128,14 +122,10 @@
 
     <div id="viewport">
         <canvas id="avatarCanvas"></canvas>
-        <div class="hint-obs">Preview Mode</div>
+        <div class="hint-obs">Web Preview Mode</div>
     </div>
 
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const isAvatarView = urlParams.has('view');
-        if (isAvatarView) document.body.classList.add('mode-avatar');
-
         let selectedBg = "", volumeSuave = 0, analyser, dataArray, audioStream, audioCtx;
         let emojiAtivo = false, frameCount = 0, noiseOffset = 0;
         const canvas = document.getElementById('avatarCanvas');
@@ -149,7 +139,7 @@
 
         async function listarFontes() {
             try {
-                if(!isAvatarView) await navigator.mediaDevices.getUserMedia({ audio: true });
+                await navigator.mediaDevices.getUserMedia({ audio: true });
                 const dispositivos = await navigator.mediaDevices.enumerateDevices();
                 const select = document.getElementById('audioSource');
                 select.innerHTML = '';
@@ -161,7 +151,7 @@
                     }
                 });
                 carregarConfig();
-            } catch (e) { console.log("Permissão necessária."); }
+            } catch (e) { console.log("Permissão necessária para o microfone."); }
         }
 
         async function iniciarAudio() {
@@ -179,7 +169,7 @@
                 source.connect(analyser);
                 dataArray = new Uint8Array(analyser.frequencyBinCount);
                 emojiAtivo = true;
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Erro no áudio:", e); }
         }
 
         function toggleEmoji() {
@@ -209,17 +199,16 @@
                 let volMapeado = (db > thresh) ? (db - thresh) / (Math.abs(thresh) || 1) * 100 : 0;
                 volumeSuave += (volMapeado - volumeSuave) * 0.2;
 
-                if (!isAvatarView) {
-                    let visualVol = ((db + 60) / 55) * 100;
-                    document.getElementById('meter-fill').style.width = Math.min(100, Math.max(0, visualVol)) + "%";
-                }
+                let visualVol = ((db + 60) / 55) * 100;
+                const meter = document.getElementById('meter-fill');
+                if(meter) meter.style.width = Math.min(100, Math.max(0, visualVol)) + "%";
             }
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const z = parseFloat(config.zoom || 1), m = parseFloat(config.intensidade || 1);
             const pX = parseFloat(config.posX || 0), pY = parseFloat(config.posY || 0);
 
-            // Background Emoji (Sólido e centralizado)
+            // Background Emoji (Sólido)
             if (config.bg) {
                 ctx.save();
                 ctx.textAlign = "center"; ctx.textBaseline = "middle";
@@ -238,7 +227,6 @@
                 } else { frameCount = 0; }
 
                 noiseOffset += 0.05 * m;
-                // Pulo limitado e suavizado
                 let jump = Math.min(volumeSuave * 0.4 * z * m, canvas.height / 3);
                 let balancoX = Math.sin(noiseOffset * 0.5) * (5 * z * m);
                 
@@ -249,11 +237,6 @@
                 ctx.fillText(char, 0, 0);
                 ctx.restore();
             }
-        }
-
-        function copiarLinkOBS() {
-            const url = window.location.origin + window.location.pathname + '?view=avatar';
-            navigator.clipboard.writeText(url); alert("Link OBS Copiado!");
         }
 
         function setPreset(seq, idle) {
@@ -270,7 +253,6 @@
         }
 
         function salvarConfig() {
-            if (isAvatarView) return;
             const config = {
                 threshold: document.getElementById('threshold').value,
                 intensidade: document.getElementById('intensidade').value,
@@ -289,23 +271,20 @@
             const s = localStorage.getItem('emojiSyncWeb');
             if(s) {
                 const c = JSON.parse(s);
-                if(!isAvatarView) {
-                    document.getElementById('threshold').value = c.threshold || -25;
-                    document.getElementById('intensidade').value = c.intensidade || 1;
-                    document.getElementById('zoom').value = c.zoom || 1;
-                    document.getElementById('posX').value = c.posX || 0;
-                    document.getElementById('posY').value = c.posY || 0;
-                    document.getElementById('emojiSilencio').value = c.silencio || "😐";
-                    document.getElementById('emojiSequencia').value = c.sequencia || "🫤😯😦😧😲😮🫨";
-                    document.getElementById('audioSource').value = c.deviceId || "";
-                }
+                document.getElementById('threshold').value = c.threshold || -25;
+                document.getElementById('intensidade').value = c.intensidade || 1;
+                document.getElementById('zoom').value = c.zoom || 1;
+                document.getElementById('posX').value = c.posX || 0;
+                document.getElementById('posY').value = c.posY || 0;
+                document.getElementById('emojiSilencio').value = c.silencio || "😐";
+                document.getElementById('emojiSequencia').value = c.sequencia || "🫤😯😦😧😲😮🫨";
+                document.getElementById('audioSource').value = c.deviceId || "";
                 selectedBg = c.bg || "";
                 atualizarMarcadorThreshold();
             }
         }
 
         function atualizarMarcadorThreshold() {
-            if (isAvatarView) return;
             const input = document.getElementById('threshold');
             const percent = ((input.value - input.min) / (input.max - input.min)) * 100;
             document.getElementById('threshold-marker').style.left = percent + "%";
@@ -320,12 +299,8 @@
             document.getElementById('bgGrid').appendChild(d);
         });
 
-        if (isAvatarView) { window.onclick = iniciarAudio; carregarConfig(); } 
-        else { listarFontes(); }
-        
+        listarFontes();
         loop();
     </script>
 </body>
 </html>
-
-
