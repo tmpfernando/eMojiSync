@@ -69,7 +69,7 @@ To integrate the avatar into your stream:
 
 If you wish to modify the source code or contribute:
 
-```powershell
+```open project folder in powershell to run commands (Node.js is must be installed):
 # Install dependencies
 npm install
 
