@@ -1,6 +1,6 @@
 # 🎙️ eMojiSync
 
-[Demonstration Video](https://www.youtube.com/watch?v=lNu-XfCwCkg) || [Try Wev Preview NOW!](https://tmpfernando.github.io/eMojiSync/)
+[Demonstration Video](https://www.youtube.com/watch?v=lNu-XfCwCkg) || [Try Web Preview NOW!](https://tmpfernando.github.io/eMojiSync/)
 
 **eMojiSync** is a minimalist desktop voice-reactive avatar application (PNGTuber style). Built with Electron, it was specifically designed for streamers who need an avatar that reacts to the microphone in real-time, eliminating performance bottlenecks and capture issues common in browser-based tools.
 
