@@ -6,7 +6,11 @@
 
 ![Version](https://img.shields.io/badge/Version-1.1.0-brightgreen)
 ![Platform](https://img.shields.io/badge/Platform-Windows-blue)
-![License](https://img.shields.io/badge/License-MIT-yellow)
+![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
+
+## 📜 License
+This project is licensed under **Creative Commons Attribution-NonCommercial 4.0 International**. 
+You are free to use, share, and adapt this software, but **you may not use the material for commercial purposes**.
 
 ## ✨ Why eMojiSync?
 Unlike web-based solutions, eMojiSync runs as a standalone process, ensuring higher stability and cleaner screen capture.
