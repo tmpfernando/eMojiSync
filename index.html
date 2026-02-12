@@ -20,7 +20,7 @@
             overflow: hidden;
         }
 
-        /* --- DASHBOARD (LADO ESQUERDO) --- */
+        /* --- DASHBOARD --- */
         #controles { 
             padding: 20px; border-right: 1px solid rgba(255,255,255,0.1);
             display: flex; flex-direction: column; gap: 12px; overflow-y: auto; 
@@ -45,7 +45,6 @@
             color: white; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none;
         }
 
-        /* Meter de Áudio */
         .meter-container { 
             width: 100%; height: 12px; background: #000; border-radius: 6px; 
             position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
@@ -53,36 +52,28 @@
         #meter-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent), var(--primary)); transition: width 0.05s; }
         #threshold-marker { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--threshold-color); box-shadow: 0 0 5px var(--threshold-color); z-index: 5; }
 
-        /* Botões */
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         button { padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 10px; transition: 0.3s; }
         button.success { background: var(--success); color: #000; }
         button.danger { background: var(--danger); color: white; }
         button.secondary { background: #333; color: white; }
-        
         .btn-obs { background: var(--primary); color: #000; grid-column: span 2; }
 
-        /* Sliders */
         .range-wrapper { display: grid; grid-template-columns: 70px 1fr; align-items: center; gap: 10px; font-size: 11px; color: var(--text-dim); }
         input[type=range] { width: 100%; accent-color: var(--primary); cursor: pointer; }
 
-        /* Presets & Grid */
         .presets-container { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
-        .btn-preset { padding: 5px 8px; background: var(--item-bg); border: 1px solid rgba(255,255,255,0.1); color: var(--text-dim); border-radius: 4px; cursor: pointer; font-size: 10px; text-transform: none; }
+        .btn-preset { padding: 5px 8px; background: var(--item-bg); border: 1px solid rgba(255,255,255,0.1); color: var(--text-dim); border-radius: 4px; cursor: pointer; font-size: 10px; }
         
         .scenario-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 6px; }
         .scenario-item { background: var(--item-bg); border-radius: 8px; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 20px; border: 2px solid transparent; }
         .scenario-item.active { border-color: var(--primary); background: rgba(0, 242, 254, 0.15); }
 
-        /* --- VIEWPORT DO AVATAR (LADO DIREITO) --- */
-        #viewport { 
-            position: relative; overflow: hidden; 
-            background: radial-gradient(circle, #1a1a1c 0%, #0a0a0b 100%); 
-        }
+        /* --- VIEWPORT --- */
+        #viewport { position: relative; overflow: hidden; background: radial-gradient(circle, #1a1a1c 0%, #0a0a0b 100%); }
         canvas { display: block; width: 100%; height: 100%; }
         .hint-obs { position: absolute; bottom: 20px; right: 20px; color: var(--text-dim); font-size: 12px; pointer-events: none; }
 
-        /* Estilo para Modo Somente Avatar (OBS) */
         body.mode-avatar { grid-template-columns: 1fr; }
         body.mode-avatar #controles { display: none; }
         body.mode-avatar #viewport { background: transparent !important; }
@@ -109,13 +100,12 @@
 
         <div class="secao">
             <div class="icon-header">Expressions</div>
-            <input type="text" id="emojiSilencio" value="😐" placeholder="Idle" oninput="salvarConfig()">
-            <input type="text" id="emojiSequencia" value="🫤😯😦😧😲😮🫨" placeholder="Sequence" oninput="salvarConfig()">
+            <input type="text" id="emojiSilencio" value="😐" oninput="salvarConfig()">
+            <input type="text" id="emojiSequencia" value="🫤😯😦😧😲😮🫨" oninput="salvarConfig()">
             <div class="presets-container">
                 <button class="btn-preset" onclick="setPreset('🫤😯😦😧😲😮🫨', '😐')">Default</button>
                 <button class="btn-preset" onclick="setPreset('😛😜🤪👅😱🤯🤪😜', '🤐')">Crazy</button>
                 <button class="btn-preset" onclick="setPreset('🐱😸😹😻🙀😽😼😺', '😼')">Cat</button>
-                <button class="btn-preset" onclick="setPreset('😠😡🥵🤬😫😭😤😡', '😡')">Mad</button>
             </div>
         </div>
 
@@ -129,7 +119,7 @@
         </div>
 
         <div class="secao">
-            <div class="icon-header">Background</div>
+            <div class="icon-header">Background (100% Opacity)</div>
             <div class="scenario-grid" id="bgGrid">
                 <div id="no-bg" class="scenario-item active" onclick="setBg(this, '')">❌</div>
             </div>
@@ -142,13 +132,12 @@
     </div>
 
     <script>
-        // --- CONFIGURAÇÃO INICIAL E ROTEAMENTO ---
         const urlParams = new URLSearchParams(window.location.search);
         const isAvatarView = urlParams.has('view');
         if (isAvatarView) document.body.classList.add('mode-avatar');
 
         let selectedBg = "", volumeSuave = 0, analyser, dataArray, audioStream, audioCtx;
-        let emojiAtivo = false, frameCount = 0;
+        let emojiAtivo = false, frameCount = 0, noiseOffset = 0;
         const canvas = document.getElementById('avatarCanvas');
         const ctx = canvas.getContext('2d');
 
@@ -156,10 +145,8 @@
             canvas.width = canvas.parentElement.clientWidth;
             canvas.height = canvas.parentElement.clientHeight;
         }
-        window.onresize = resize;
-        resize();
+        window.onresize = resize; resize();
 
-        // --- GESTÃO DE ÁUDIO ---
         async function listarFontes() {
             try {
                 if(!isAvatarView) await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -169,34 +156,30 @@
                 dispositivos.forEach(dev => {
                     if (dev.kind === 'audioinput') {
                         const opt = document.createElement('option');
-                        opt.value = dev.deviceId;
-                        opt.text = dev.label || `Mic ${select.length + 1}`;
+                        opt.value = dev.deviceId; opt.text = dev.label || `Mic ${select.length + 1}`;
                         select.appendChild(opt);
                     }
                 });
                 carregarConfig();
-            } catch (e) { console.log("Aguardando interação para áudio."); }
+            } catch (e) { console.log("Permissão necessária."); }
         }
 
         async function iniciarAudio() {
             if (audioStream) audioStream.getTracks().forEach(t => t.stop());
             const config = JSON.parse(localStorage.getItem('emojiSyncWeb') || '{}');
-            const deviceId = config.deviceId || document.getElementById('audioSource').value;
+            const deviceId = config.deviceId || (document.getElementById('audioSource') ? document.getElementById('audioSource').value : null);
             
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === 'suspended') await audioCtx.resume();
 
             try {
-                audioStream = await navigator.mediaDevices.getUserMedia({ 
-                    audio: deviceId ? { exact: deviceId } : true 
-                });
+                audioStream = await navigator.mediaDevices.getUserMedia({ audio: deviceId ? { exact: deviceId } : true });
                 const source = audioCtx.createMediaStreamSource(audioStream);
-                analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 128;
+                analyser = audioCtx.createAnalyser(); analyser.fftSize = 128;
                 source.connect(analyser);
                 dataArray = new Uint8Array(analyser.frequencyBinCount);
                 emojiAtivo = true;
-            } catch (e) { alert("Erro ao acessar microfone. Verifique as permissões."); }
+            } catch (e) { console.error(e); }
         }
 
         function toggleEmoji() {
@@ -206,15 +189,10 @@
                 document.getElementById('btnToggle').className = "danger";
             } else {
                 emojiAtivo = false;
-                if (audioStream) audioStream.getTracks().forEach(t => t.stop());
                 document.getElementById('btnToggle').textContent = "Start Mic";
                 document.getElementById('btnToggle').className = "success";
-                volumeSuave = 0;
             }
         }
-
-        // --- MOTOR DE RENDERIZAÇÃO ---
-        let rotation_atual = 0, noiseOffset = 0;
 
         function loop() {
             requestAnimationFrame(loop);
@@ -228,8 +206,8 @@
                 let db = 20 * Math.log10(rms / 255 || 0.00001);
                 
                 const thresh = parseFloat(config.threshold || -25);
-                let volMapeado = (db > thresh) ? (db - thresh) / (Math.abs(thresh) || 1) * 160 : 0;
-                volumeSuave += (volMapeado - volumeSuave) * 0.25;
+                let volMapeado = (db > thresh) ? (db - thresh) / (Math.abs(thresh) || 1) * 100 : 0;
+                volumeSuave += (volMapeado - volumeSuave) * 0.2;
 
                 if (!isAvatarView) {
                     let visualVol = ((db + 60) / 55) * 100;
@@ -241,11 +219,13 @@
             const z = parseFloat(config.zoom || 1), m = parseFloat(config.intensidade || 1);
             const pX = parseFloat(config.posX || 0), pY = parseFloat(config.posY || 0);
 
+            // Background Emoji (Sólido e centralizado)
             if (config.bg) {
                 ctx.save();
                 ctx.textAlign = "center"; ctx.textBaseline = "middle";
-                ctx.font = "400px sans-serif"; ctx.globalAlpha = 1.0;
-                ctx.fillText(config.bg, canvas.width/2, canvas.height/2);
+                ctx.font = (400 * z) + "px sans-serif";
+                ctx.globalAlpha = 1.0; 
+                ctx.fillText(config.bg, canvas.width/2 + pX, canvas.height/2 + pY);
                 ctx.restore();
             }
 
@@ -253,12 +233,13 @@
                 let char = config.silencio || "😐";
                 if (volumeSuave > 2) {
                     const seq = [...(config.sequencia || "🫤😯😦😧😲😮🫨")];
-                    char = seq[Math.floor(frameCount/15) % seq.length] || char;
+                    char = seq[Math.floor(frameCount/12) % seq.length] || char;
                     frameCount++;
                 } else { frameCount = 0; }
 
                 noiseOffset += 0.05 * m;
-                let jump = (volumeSuave * 8 * z * m);
+                // Pulo limitado e suavizado
+                let jump = Math.min(volumeSuave * 4 * z * m, canvas.height / 3);
                 let balancoX = Math.sin(noiseOffset * 0.5) * (5 * z * m);
                 
                 ctx.save();
@@ -270,11 +251,9 @@
             }
         }
 
-        // --- FUNÇÕES AUXILIARES ---
         function copiarLinkOBS() {
             const url = window.location.origin + window.location.pathname + '?view=avatar';
-            navigator.clipboard.writeText(url);
-            alert("Link para o OBS copiado!");
+            navigator.clipboard.writeText(url); alert("Link OBS Copiado!");
         }
 
         function setPreset(seq, idle) {
@@ -332,12 +311,8 @@
             document.getElementById('threshold-marker').style.left = percent + "%";
         }
 
-        function resetConfig() {
-            localStorage.removeItem('emojiSyncWeb');
-            location.reload();
-        }
+        function resetConfig() { localStorage.removeItem('emojiSyncWeb'); location.reload(); }
 
-        // --- INICIALIZAÇÃO ---
         const scenes = ["☀️", "☁️", "⛈️", "🌊", "🔥", "🏙️", "🌆", "🌌", "🌈", "⛩️", "🛸", "💀"];
         scenes.forEach(s => {
             const d = document.createElement('div'); d.className = 'scenario-item'; d.textContent = s;
@@ -345,15 +320,10 @@
             document.getElementById('bgGrid').appendChild(d);
         });
 
-        if (isAvatarView) {
-            window.onclick = iniciarAudio;
-            carregarConfig();
-        } else {
-            listarFontes();
-        }
+        if (isAvatarView) { window.onclick = iniciarAudio; carregarConfig(); } 
+        else { listarFontes(); }
         
         loop();
     </script>
 </body>
 </html>
-
