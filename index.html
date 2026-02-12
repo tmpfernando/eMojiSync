@@ -244,7 +244,7 @@
             if (config.bg) {
                 ctx.save();
                 ctx.textAlign = "center"; ctx.textBaseline = "middle";
-                ctx.font = "400px sans-serif"; ctx.globalAlpha = 0.2;
+                ctx.font = "400px sans-serif"; ctx.globalAlpha = 1;
                 ctx.fillText(config.bg, canvas.width/2, canvas.height/2);
                 ctx.restore();
             }
@@ -338,7 +338,7 @@
         }
 
         // --- INICIALIZAÇÃO ---
-        const scenes = ["☀️", "☁️", "⛈️", "🌊", "🔥", "🏙️", "🌆", "🌌", "🌈", "⛩️", "🛸", "💀"];
+        const scenes = ["☀️", "☁️", "⛈️", "❄️", "🌊", "🔥", "🌋", "🌲", "🌴", "🌵", "🏙️", "🌆", "🌇", "🌃", "🏙", "🏘️", "🏰", "🏛️", "🎡", "🗼", "🏔️", "⛰️", "🏜️", "🏝️", "🏕️", "🛤️", "🛣️", "🏟️", "🏗️", "🛸", "🏠", "🏪", "🏫", "🏭", "🏮", "🌌", "🌈", "⛩️", "🕋", "⛪"];
         scenes.forEach(s => {
             const d = document.createElement('div'); d.className = 'scenario-item'; d.textContent = s;
             d.onclick = () => setBg(d, s);
@@ -356,3 +356,4 @@
     </script>
 </body>
 </html>
+
