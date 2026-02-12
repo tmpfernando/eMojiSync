@@ -63,8 +63,7 @@ To integrate the avatar into your stream:
 
 If **eMojiSync** helps your stream, consider supporting the developer:
 
-* [🚀 Support via APOIA.se (Brazil)](https://apoia.se/YOUR_LINK_HERE)
-* [💸 Support via LivePix](https://livepix.gg/YOUR_LINK_HERE)
+* [🚀 Support via APOIA.se (Brazil)](https://apoia.se/emojisync)
 
 ---
 
