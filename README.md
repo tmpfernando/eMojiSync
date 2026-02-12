@@ -1,97 +1,68 @@
-# 🎙️ eMojiSync
+# 🎙️ eMojiSync (Web Preview)
 
-[Demonstration Video](https://www.youtube.com/watch?v=lNu-XfCwCkg)
+[Demonstration Video](https://www.youtube.com/watch?v=lNu-XfCwCkg) | [**Try it Online Now!**](https://tmpfernando.github.io/eMojiSync)
 
-**eMojiSync** is a minimalist desktop voice-reactive avatar application (PNGTuber style). Built with Electron, it was specifically designed for streamers who need an avatar that reacts to the microphone in real-time, eliminating performance bottlenecks and capture issues common in browser-based tools.
+**eMojiSync Web** is the browser-based version of the minimalist voice-reactive avatar application. This version allows you to use your favorite emojis as a PNGTuber avatar directly from your browser, making it compatible with any OS (Windows, Mac, Linux) and perfect for quick setups using OBS Browser Source.
 
-![Version](https://img.shields.io/badge/Version-1.1.0-brightgreen)
-![Platform](https://img.shields.io/badge/Platform-Windows-blue)
+![Version](https://img.shields.io/badge/Version-Web--1.0-orange)
+![Platform](https://img.shields.io/badge/Platform-Web--Browser-blue)
 ![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)
+
+---
+
+## ✨ Web Version Highlights
+- **Zero Installation:** Open the link and start streaming.
+- **Cross-Platform:** Works on any modern browser (Chrome, Edge, Firefox).
+- **OBS Browser Source Ready:** A clean, dedicated link for a transparent background in your stream.
+- **Low Latency:** Optimized Web Audio API for instant voice reaction.
+
+---
+
+## 🚀 How to Use
+
+1. **Access the Web App:** Open the [eMojiSync Web Link](https://tmpfernando.github.io/eMojiSync).
+2. **Setup your Mic:** Select your microphone in the "Audio & OBS" section and click **START MIC**.
+3. **Customize:**
+   - **Idle:** Pick an emoji for silence.
+   - **Sequence:** Type a sequence of emojis (e.g., `🫤😯😦😧😲😮🫨`) for the talking animation.
+   - **Physics:** Adjust Sensitivity (Threshold), Zoom, and Motion Intensity.
+4. **Scene:** Choose a background emoji if you want a static scenario behind your avatar.
+
+---
+
+## 📺 OBS Studio Integration
+
+For the best experience (transparent background and clean capture):
+
+1. Configure your avatar on the eMojiSync website.
+2. Click the **🔗 Copy OBS Browser Link** button.
+3. In OBS, add a new **Browser Source**.
+4. Paste the copied URL (it should end with `?view=avatar`).
+5. Set the width/height to match your stream (e.g., 1920x1080).
+6. **Important:** - Browsers block auto-audio. Right-click the source in OBS > **Interact** and click anywhere on the screen to "wake up" the microphone detection.
+   - Alternatively, check **"Control audio via OBS"** in the source properties.
+
+---
 
 ## 📜 License
 This project is licensed under **Creative Commons Attribution-NonCommercial 4.0 International**.  
 You are free to use, share, and adapt this software, but **you may not use the material for commercial purposes**.
 
-## ✨ Why eMojiSync?
-Unlike web-based solutions, eMojiSync runs as a standalone process, ensuring higher stability and cleaner screen capture.
-- **Dual-Window System:** A dedicated Control Panel for settings and a clean "Avatar Window" for OBS capture.
-- **System Tray Integration:** Minimize the app to the system tray (near the clock) to keep your taskbar clean while keeping the microphone active.
-- **Zero Lag:** Instantaneous synchronization between your voice and the emoji animation.
-- **Ghost Window:** The avatar window doesn't clutter your taskbar, making it perfect for clean desktop management.
-
----
-
-## 📥 Installation
-
-For users who just want to run the program (no coding required):
-
-1. Navigate to the [**Releases**](https://github.com/tmpfernando/eMojiSync/releases/tag/eMojiSync_x64) tab.
-2. Download the `eMojiSync-win32-x64.zip` file.
-3. Extract the contents to a folder of your choice.
-4. Run the **`eMojiSync.exe`** file.
-5. **Tip:** Right-click `eMojiSync.exe` and select `Send to > Desktop (Create shortcut)` for quick access.
-
----
-
-## 🛠️ Configuration
-
-1. **Microphone:** Click **START MICROPHONE** upon launching to enable voice detection.
-2. **Customization:** - **Idle Emoji:** The emoji displayed when you are silent.
-   - **Talking Emojis:** A sequence of emojis (e.g., 😲😮😧) that creates the talking animation.
-3. **Fine-Tuning:**
-   - **Sensitivity:** Adjust to ignore background noise or mechanical keyboard clicks.
-   - **Zoom/Position:** Control the framing of the avatar within the capture window.
-4. **💡 Pro Tip (Background Running):** - When you click **Minimize**, the dashboard hides in the **System Tray** (near the Windows clock). 
-   - This prevents Windows from freezing the audio process. 
-   - To open settings again, **double-click** the icon in the tray.
-
----
-
-## 📺 OBS Studio Setup
-
-To integrate the avatar into your stream:
-
-1. Open **eMojiSync** and set up your emojis.
-2. In OBS, add a new **Window Capture** source.
-3. Select the window: `[eMojiSync.exe]: eMojiSync - Avatar Window`.
-4. **IMPORTANT:** In the *Capture Method* field, select **Windows 10 (1903 or higher)**.
-5. **Note:** Even if you minimize the dashboard to the tray, the avatar will remain visible to OBS as long as you don't manually close the app.
-
 ---
 
 ## 💖 Support the Project
-
-If **eMojiSync** helps your stream, consider supporting the developer:
+Help me turn these emojis into exclusive hand-drawn art and professional software!
 
 * [🚀 Support via APOIA.se (Brazil)](https://apoia.se/emojisync)
 
 ---
 
-## ❓ Troubleshooting
+## 👨‍💻 Local Development
+If you want to host this yourself or modify the web code:
 
-**Avatar window is not appearing in OBS:**
-- Ensure the app is running (check the System Tray near the clock).
-- Try running OBS as an **Administrator**.
-
-**The Avatar screen is black in OBS:**
-- In the Window Capture properties, you **must** change the *Capture Method* to "Windows 10 (1903 or higher)".
-
-**The Emoji is not moving:**
-- Ensure you have clicked the "START MICROPHONE" button.
-- Check if your microphone is set as the "Default Device" in Windows Sound Settings.
+1. Clone this repository.
+2. No dependencies or `npm install` required for the web version!
+3. Just open `index.html` in any modern browser.
 
 ---
-
-## 👨‍💻 For Developers (Build)
-
-If you wish to modify the source code or contribute (Node.js required):
-
-```powershell
-# Install dependencies
-npm install
-
-# Run in development mode
-npm start
-
-# Generate the executable/distributables
-npm run make
+*Created with ❤️ by [TMPfernando/GitHub]*
