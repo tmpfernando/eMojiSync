@@ -13,7 +13,6 @@
 ## ✨ Web Version Highlights
 - **Zero Installation:** Open the link and start streaming.
 - **Cross-Platform:** Works on any modern browser (Chrome, Edge, Firefox).
-- **OBS Browser Source Ready:** A clean, dedicated link for a transparent background in your stream.
 - **Low Latency:** Optimized Web Audio API for instant voice reaction.
 
 ---
